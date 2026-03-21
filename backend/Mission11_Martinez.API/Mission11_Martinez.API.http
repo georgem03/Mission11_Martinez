@@ -1,0 +1,6 @@
+@Mission11_Martinez.API_HostAddress = http://localhost:5218
+
+GET {{Mission11_Martinez.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
