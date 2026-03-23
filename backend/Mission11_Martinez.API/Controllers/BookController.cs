@@ -4,7 +4,7 @@ using Mission11_Martinez.API.Data;
 
 namespace Mission11_Martinez.API.Controllers
 {
-    [Route("[controller]")]
+    [Route("Books")]
     [ApiController]
     public class BookController : ControllerBase
     {
@@ -12,12 +12,30 @@ namespace Mission11_Martinez.API.Controllers
         
         public BookController(BookStoreDbContext temp) => _bookContext = temp;
         
-        
-        public IEnumerable<Book> GetBooks()
+        [HttpGet]
+        public IActionResult GetBooks(int pageSize = 5, int pageNum = 1, string sort = "title_asc")
         {
-            var something = _bookContext.Books.ToList();
-            
-            return something;
+            var query = _bookContext.Books.AsQueryable();
+
+            // Sorting
+            query = sort.ToLower() switch
+            {
+                "title_desc" => query.OrderByDescending(b => b.Title),
+                _ => query.OrderBy(b => b.Title)
+            };
+
+            var totalNumBooks = query.Count();
+
+            var books = query
+                .Skip((pageNum - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            return Ok(new
+            {
+                Books = books,
+                TotalNumBooks = totalNumBooks
+            });
         }
     }
 }
